@@ -8,7 +8,7 @@ public class TileGridLayout : LayoutGroup
 {
     public int Padding;
     public float Spacing;
-    public bool TilesSpawned;
+    public bool TileCoordsSet;
 
     private Vector2 tileSize;
     private int rows;
@@ -16,7 +16,7 @@ public class TileGridLayout : LayoutGroup
 
     protected override void Awake()
     {
-        TilesSpawned = false;
+        TileCoordsSet = false;
         rows = 4;
         columns = 4;
     }
@@ -58,7 +58,7 @@ public class TileGridLayout : LayoutGroup
             SetChildAlongAxis(tile, 1, yPos, tileSize.y);
         }
 
-        TilesSpawned = true;
+        TileCoordsSet = true;
     }
 
     public override void CalculateLayoutInputVertical()

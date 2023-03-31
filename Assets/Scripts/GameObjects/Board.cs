@@ -16,15 +16,14 @@ public class Board : MonoBehaviour
     }
     private void Start()
     {
-        //StartCoroutine(InitialFill());
-        SpawnTileFill(2);
+        StartCoroutine(InitialFill());
     }
 
     public IEnumerator InitialFill()
     {
-        while(TileGrid.TilesSpawned == false)
+        while(TileGrid.TileCoordsSet == false)
         {
-            yield return new WaitForSeconds(0.25f);
+            yield return new WaitForSeconds(0.5f);
         }
         SpawnTileFill(2);
     }
@@ -37,11 +36,9 @@ public class Board : MonoBehaviour
 
             var fillCoord = new Coordinate(x, y);
 
-            print(fillCoord);
-
             var fillParent = FindTile(fillCoord);
 
-            Instantiate(TileFill, fillParent.gameObject.transform);
+            var tileFill = Instantiate(TileFill, fillParent.gameObject.transform);
         }
     }
     private Tile FindTile(Coordinate coord)
