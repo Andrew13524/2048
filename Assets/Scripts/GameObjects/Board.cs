@@ -1,22 +1,49 @@
+using Assets.Scripts.GameObjects;
 using Assets.Scripts.Models;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Assets.Scripts.Models.Constants;
+using Random = UnityEngine.Random;
 
 public class Board : MonoBehaviour
 {
     public TileGridLayout TileGrid;
     public GameObject TileFill;
 
-    private Tile[] tiles;
+    private Tile[,] tiles;
 
-    private void Awake()
-    {
-        tiles = gameObject.GetComponentsInChildren<Tile>();
-    }
     private void Start()
     {
+        tiles = GetTiles();
         StartCoroutine(InitialFill());
+    }
+    private void Update()
+    {
+        if (Input.anyKeyDown)
+        {
+            if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+            {
+                ShiftTiles(Direction.UP);
+                SpawnTileFill(1);
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+            {
+                ShiftTiles(Direction.DOWN);
+                SpawnTileFill(1);
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+            {
+                ShiftTiles(Direction.RIGHT);
+                SpawnTileFill(1);
+            }
+            else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+            {
+                ShiftTiles(Direction.LEFT);
+                SpawnTileFill(1);
+            }
+        }
     }
 
     public IEnumerator InitialFill()
@@ -31,26 +58,79 @@ public class Board : MonoBehaviour
     {
         for(int i = 0; i < amount; i++)
         {
-            var x = Random.Range(0, 4);
-            var y = Random.Range(0, 4);
+            var availableTiles = GetAvailableTiles();
 
-            var fillCoord = new Coordinate(x, y);
+            if (availableTiles.Count == 0) return;
 
-            var fillParent = FindTile(fillCoord);
+            var tile = availableTiles[Random.Range(0, availableTiles.Count)];
 
-            var tileFill = Instantiate(TileFill, fillParent.gameObject.transform);
+            Instantiate(TileFill, tile.transform);
         }
     }
-    private Tile FindTile(Coordinate coord)
+
+    private void ShiftTiles(Direction direction)
     {
-        for(int i = 0; i < tiles.Length; i++)
+        for (int i = 0; i < GRID_SIDE_LENGTH; i++)
         {
-            var tile = tiles[i];
-            if (tile.Coordinate.X == coord.X && tile.Coordinate.Y == coord.Y)
+            var emptyTiles = new Queue<Tile>();
+            for (int j = GRID_SIDE_LENGTH - 1; j >= 0; j--)
             {
-                return tiles[i];
+                Tile currentTile;
+
+                if (direction == Direction.RIGHT)     currentTile = tiles[j, i];
+                else if (direction == Direction.DOWN) currentTile = tiles[i, j];
+                else if (direction == Direction.UP)   currentTile = tiles[i, Math.Abs(j - (GRID_SIDE_LENGTH - 1))];
+                else                                  currentTile = tiles[Math.Abs(j - (GRID_SIDE_LENGTH - 1)), i];
+
+                if (currentTile.HasFill)
+                {
+                    if (emptyTiles.Count > 0)
+                    {
+                        var tileFill = currentTile.GetComponentInChildren<TileFill>();
+                        tileFill.transform.SetParent(emptyTiles.Dequeue().transform);
+                        emptyTiles.Enqueue(currentTile);
+                    }
+                }
+                else
+                {
+                    emptyTiles.Enqueue(currentTile);
+                }
             }
         }
-        throw new KeyNotFoundException();
+    }
+        
+    private Tile[,] GetTiles()
+    {
+        var tiles = new Tile[TILE_COLUMNS, TILE_ROWS];
+        var children = gameObject.GetComponentsInChildren<Tile>();
+
+        for (int i = 0; i < TILE_COLUMNS; i++)
+        {
+            for(int j = 0; j < TILE_ROWS; j++)
+            {
+                tiles[i, j] = children[(j * TILE_ROWS) + i];
+            }
+        }
+        return tiles;
+    }
+
+    private List<Tile> GetFilledTiles()
+    {
+        var filledTiles = new List<Tile>();
+        foreach(var tile in tiles)
+        {
+            if (tile.HasFill == true) filledTiles.Add(tile);
+        }
+        return filledTiles;
+    }
+
+    private List<Tile> GetAvailableTiles()
+    {
+        var availableTiles = new List<Tile>();
+        foreach(var tile in tiles)
+        {
+            if (!tile.HasFill) availableTiles.Add(tile);
+        }
+        return availableTiles;
     }
 }

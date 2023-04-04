@@ -1,4 +1,5 @@
 using Assets.Scripts.Models;
+using static Assets.Scripts.Models.Constants;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,14 +12,10 @@ public class TileGridLayout : LayoutGroup
     public bool TileCoordsSet;
 
     private Vector2 tileSize;
-    private int rows;
-    private int columns;
 
     protected override void Awake()
     {
         TileCoordsSet = false;
-        rows = 4;
-        columns = 4;
     }
 
     public override void CalculateLayoutInputHorizontal()
@@ -28,8 +25,8 @@ public class TileGridLayout : LayoutGroup
         float parentWidth = rectTransform.rect.width;
         float parentHeight = rectTransform.rect.height;
 
-        float tileWidth = (parentWidth / columns) - (Spacing * (columns - 1)) / columns - (Padding / columns) * 2;
-        float tileHeight = (parentHeight / rows) - (Spacing * (rows - 1)) / rows - (Padding / rows) * 2;
+        float tileWidth = (parentWidth / TILE_COLUMNS) - (Spacing * (TILE_COLUMNS - 1)) / TILE_COLUMNS - (Padding / TILE_COLUMNS) * 2;
+        float tileHeight = (parentHeight / TILE_ROWS) - (Spacing * (TILE_ROWS - 1)) / TILE_ROWS - (Padding / TILE_ROWS) * 2;
 
         tileSize.x = tileWidth;
         tileSize.y = tileHeight;
@@ -46,8 +43,8 @@ public class TileGridLayout : LayoutGroup
         {
             var tile = rectChildren[i];
 
-            rowCount = i / columns;
-            columnCount = i % columns;
+            rowCount = i / TILE_COLUMNS;
+            columnCount = i % TILE_COLUMNS;
 
             var xPos = (tileSize.x * columnCount) + (Spacing * columnCount) + Padding;
             var yPos = (tileSize.y * rowCount) + (Spacing * rowCount) + Padding;

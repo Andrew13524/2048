@@ -10,7 +10,8 @@ namespace Assets.Scripts.GameObjects
 {
     public class TileFill : MonoBehaviour
     {
-        public float TransitionSpeed;
+        public float MoveTransitionSpeed;
+        public float ScaleTransitionSpeed;
         private Vector3 targetScale;
         private void Awake()
         {
@@ -18,12 +19,25 @@ namespace Assets.Scripts.GameObjects
             targetScale = new Vector3(1, 1, 1);
             StartCoroutine(SpawnTransition());
         }
+        private void OnTransformParentChanged()
+        {
+            StartCoroutine(MoveTransition());
+        }
 
         private IEnumerator SpawnTransition()
         {
             while (Vector3.Distance(targetScale, gameObject.transform.localScale) > 0.01f)
             {
-                gameObject.transform.localScale = Vector3.Lerp(gameObject.transform.localScale, targetScale, TransitionSpeed * Time.deltaTime);
+                gameObject.transform.localScale = Vector3.Lerp(gameObject.transform.localScale, targetScale, ScaleTransitionSpeed * Time.deltaTime);
+                yield return null;
+            }
+        }
+        
+        private IEnumerator MoveTransition()
+        {
+            while (Vector3.Distance(Vector3.zero, gameObject.transform.localPosition) > 0.01f)
+            {
+                gameObject.transform.localPosition = Vector3.Lerp(gameObject.transform.localPosition, Vector3.zero, MoveTransitionSpeed * Time.deltaTime);
                 yield return null;
             }
         }
