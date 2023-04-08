@@ -12,14 +12,11 @@ public class Tile : MonoBehaviour
     private void Awake()
     {
         HasFill = false;
+        if (gameObject.GetComponentsInChildren<Transform>().Length > 1) HasFill = true;
     }
     private void OnTransformChildrenChanged()
     {
-        if (gameObject.GetComponentsInChildren<Transform>().Length > 1) {
-            HasFill = true;
-        }
-        else {
-            HasFill = false;
-        };
+        if (gameObject.GetComponentsInChildren<Transform>().Length > 1) HasFill = true;
+        else HasFill = false;
     }
 }

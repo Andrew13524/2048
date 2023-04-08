@@ -226,7 +226,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b2cbc332de39144f901df7ed1f9948c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveTransitionSpeed: 10
+  ValueText: {fileID: 4455932107319219228}
+  MoveTransitionSpeed: 4000
   ScaleTransitionSpeed: 5
 --- !u!223 &5439991009288430739
 Canvas:

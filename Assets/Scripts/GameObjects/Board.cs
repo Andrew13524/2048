@@ -21,28 +21,26 @@ public class Board : MonoBehaviour
     }
     private void Update()
     {
-        if (Input.anyKeyDown)
+        if (DirectionalKeysPressed())
         {
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             {
                 ShiftTiles(Direction.UP);
-                SpawnTileFill(1);
+                
             }
             else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
             {
                 ShiftTiles(Direction.DOWN);
-                SpawnTileFill(1);
             }
             else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
             {
                 ShiftTiles(Direction.RIGHT);
-                SpawnTileFill(1);
             }
             else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
             {
                 ShiftTiles(Direction.LEFT);
-                SpawnTileFill(1);
             }
+            SpawnTileFill(1);
         }
     }
 
@@ -73,9 +71,12 @@ public class Board : MonoBehaviour
         for (int i = 0; i < GRID_SIDE_LENGTH; i++)
         {
             var emptyTiles = new Queue<Tile>();
+            Tile mergeableTile = null;
+
             for (int j = GRID_SIDE_LENGTH - 1; j >= 0; j--)
             {
                 Tile currentTile;
+                Tile newTile;
 
                 if (direction == Direction.RIGHT)     currentTile = tiles[j, i];
                 else if (direction == Direction.DOWN) currentTile = tiles[i, j];
@@ -84,12 +85,28 @@ public class Board : MonoBehaviour
 
                 if (currentTile.HasFill)
                 {
+                    if(mergeableTile != null)
+                    {
+                        if (mergeableTile.GetComponentInChildren<TileFill>().Value == currentTile.GetComponentInChildren<TileFill>().Value)
+                        {
+                            var currentTileFill = currentTile.GetComponentInChildren<TileFill>();
+                            currentTileFill.transform.SetParent(mergeableTile.transform);
+                            mergeableTile.GetComponentInChildren<TileFill>().Value *= 2;
+                            emptyTiles.Enqueue(currentTile);
+                            mergeableTile = null;
+                            continue;
+                        }
+                    }
+
                     if (emptyTiles.Count > 0)
                     {
                         var tileFill = currentTile.GetComponentInChildren<TileFill>();
                         tileFill.transform.SetParent(emptyTiles.Dequeue().transform);
                         emptyTiles.Enqueue(currentTile);
+                        currentTile = tileFill.GetComponentInParent<Tile>();
                     }
+                    mergeableTile = currentTile;
+                    
                 }
                 else
                 {
@@ -132,5 +149,14 @@ public class Board : MonoBehaviour
             if (!tile.HasFill) availableTiles.Add(tile);
         }
         return availableTiles;
+    }
+
+    private bool DirectionalKeysPressed()
+    {
+        foreach(var key in DIRECTIONAL_KEYS)
+        {
+            if (Input.GetKeyDown(key)) return true;
+        }
+        return false;
     }
 }
