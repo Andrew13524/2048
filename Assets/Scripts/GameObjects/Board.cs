@@ -3,7 +3,10 @@ using Assets.Scripts.Models;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using static Assets.Scripts.Models.Constants;
 using Random = UnityEngine.Random;
 
@@ -11,6 +14,7 @@ public class Board : MonoBehaviour
 {
     public TileGridLayout TileGrid;
     public GameObject TileFill;
+    public GameObject GameOverScreen;
 
     private Tile[,] tiles;
 
@@ -23,6 +27,15 @@ public class Board : MonoBehaviour
     {
         if (DirectionalKeysPressed())
         {
+            if(GetFilledTiles().Count == TILE_COLUMNS * TILE_ROWS)
+            {
+                if (!AnyLegalMoves()) 
+                {
+                    SetAlpha(0.3f);
+                    GameOverScreen.SetActive(true); 
+                }
+            }
+
             if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
             {
                 ShiftTiles(Direction.UP);
@@ -66,6 +79,10 @@ public class Board : MonoBehaviour
         }
     }
 
+    public void ResetScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
     private void ShiftTiles(Direction direction)
     {
         for (int i = 0; i < GRID_SIDE_LENGTH; i++)
@@ -152,6 +169,37 @@ public class Board : MonoBehaviour
         return availableTiles;
     }
 
+    private bool AnyLegalMoves()
+    {
+        for(int i = 0; i < 2; i++)
+        {
+            for (int j = 0; j < tiles.GetLength(0); j++)
+            {
+                Tile lastTile = null;
+                for (int k = 0; k < tiles.GetLength(1); k++)
+                {
+                    Tile currentTile;
+
+                    if (i == 0) currentTile = tiles[j, k];
+                    else currentTile = tiles[k, j];
+
+                    if (k == 0)
+                    {
+                        lastTile = currentTile;
+                        continue;
+                    }
+
+                    if (lastTile.GetComponentInChildren<TileFill>().Level == currentTile.GetComponentInChildren<TileFill>().Level)
+                    {
+                        return true;
+                    }
+
+                    lastTile = currentTile;
+                }
+            }
+        }
+        return false;
+    }
     private bool DirectionalKeysPressed()
     {
         foreach(var key in DIRECTIONAL_KEYS)
@@ -159,5 +207,23 @@ public class Board : MonoBehaviour
             if (Input.GetKeyDown(key)) return true;
         }
         return false;
+    }
+    private void SetAlpha(float alpha)
+    {
+        Image[] children = GetComponentsInChildren<Image>();
+        foreach (var child in children)
+        {
+            Color newColor = child.color;
+            newColor.a = alpha;
+            child.color = newColor;
+        }
+
+        TextMeshProUGUI[] textChildren = GetComponentsInChildren<TextMeshProUGUI>();
+        foreach (TextMeshProUGUI textChild in textChildren)
+        {
+            Color newTextColor = textChild.color;
+            newTextColor.a = alpha;
+            textChild.color = newTextColor;
+        }
     }
 }
