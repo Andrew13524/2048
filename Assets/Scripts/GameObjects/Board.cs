@@ -76,7 +76,6 @@ public class Board : MonoBehaviour
             for (int j = GRID_SIDE_LENGTH - 1; j >= 0; j--)
             {
                 Tile currentTile;
-                Tile newTile;
 
                 if (direction == Direction.RIGHT)     currentTile = tiles[j, i];
                 else if (direction == Direction.DOWN) currentTile = tiles[i, j];
@@ -87,11 +86,13 @@ public class Board : MonoBehaviour
                 {
                     if(mergeableTile != null)
                     {
-                        if (mergeableTile.GetComponentInChildren<TileFill>().Value == currentTile.GetComponentInChildren<TileFill>().Value)
+                        var mergeableTileFill = mergeableTile.GetComponentInChildren<TileFill>();
+                        var currentTileFill = currentTile.GetComponentInChildren<TileFill>();
+
+                        if (mergeableTileFill.Level == currentTileFill.Level)
                         {
-                            var currentTileFill = currentTile.GetComponentInChildren<TileFill>();
                             currentTileFill.transform.SetParent(mergeableTile.transform);
-                            mergeableTile.GetComponentInChildren<TileFill>().Value *= 2;
+                            mergeableTileFill.Level += 1;
                             emptyTiles.Enqueue(currentTile);
                             mergeableTile = null;
                             continue;

@@ -197,7 +197,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.9333334, g: 0.8941177, b: 0.854902, a: 1}
+  m_Color: {r: 0.9294118, g: 0.7607844, b: 0.18039216, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -227,6 +227,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ValueText: {fileID: 4455932107319219228}
+  Image: {fileID: 6269333627647501931}
   MoveTransitionSpeed: 4000
   ScaleTransitionSpeed: 5
 --- !u!223 &5439991009288430739

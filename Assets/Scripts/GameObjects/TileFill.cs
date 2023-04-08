@@ -6,32 +6,37 @@ using System.Text;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+using static Assets.Scripts.Models.Constants;
 
 namespace Assets.Scripts.GameObjects
 {
     public class TileFill : MonoBehaviour
     {
         public TextMeshProUGUI ValueText;
+        public Image Image;
 
-        public int Value 
-        { 
-            get => value; 
+        public int Level 
+        {
+            get => level;
             set
             {
-                this.value = value;
-                ValueText.text = this.value.ToString();
-            }
+                level = value;
+                ValueText.text = Math.Pow(2, level).ToString();
+                UpdateFillColor();
+            } 
         }
-        private int value;
+        private int level;
 
         public float MoveTransitionSpeed;
         public float ScaleTransitionSpeed;
         private Vector3 targetScale;
+
         private void Awake()
         {
             gameObject.transform.localScale = new Vector3(0, 0, 0);
             targetScale = new Vector3(1, 1, 1);
-            Value = 2;
+            Level = 1;
 
             StartCoroutine(SpawnTransition());
         }
@@ -65,6 +70,15 @@ namespace Assets.Scripts.GameObjects
                     Destroy(gameObject);
                 }
             }
+        }
+
+        private void UpdateFillColor()
+        {
+            var colorIndex = (Level - 1) % (TILE_COLORS.Length + 1);
+            var colorHex = TILE_COLORS[colorIndex];
+
+            if (colorIndex > 1) ValueText.color = Color.white;
+            if (ColorUtility.TryParseHtmlString(colorHex, out Color color)) Image.color = color;
         }
     }
 }
